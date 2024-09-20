@@ -1,0 +1,16 @@
+{
+    "name": "backend/products",
+    "description": "Api destinated to integrate frontend-products",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Backend\\Products\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Gabriel Godoi and Vitor Tavares"
+        }
+    ],
+    "require": {}
+}
