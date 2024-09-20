@@ -25,8 +25,7 @@ class Router
                 return call_user_func(callback: $route['callback']);
             }
         }
-
-        //erro ao buscar rota
+        
         http_response_code(404);
         echo json_encode(
             [
