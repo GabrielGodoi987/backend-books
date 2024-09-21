@@ -23,7 +23,7 @@ class Router
 
         foreach (self::$routes as $route) {
             if ($route['method'] == $method && preg_match($route['url'], $uri, $matches)) {
-                
+
                 $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
                 return call_user_func_array($route['callback'], $params);
             }

@@ -1,5 +1,6 @@
 <?php
-
+// recebe os dados e enviaos para o controller
+// após isso deve retornar uma resposta para o usuário
 namespace Backend\Products\Controller;
 
 use Backend\Products\Model\ProductModel;
@@ -21,5 +22,9 @@ class ProductController
     public function getAllProducts()
     {
         return $this->productsModel->getAllProducts();
+    }
+
+    public function getProductById($id){
+        return $this->productsModel->getProductById($id);
     }
 }
