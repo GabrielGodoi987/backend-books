@@ -8,9 +8,10 @@ class Router
 
     public static function addRoutes($method, $url, $callback)
     {
+        $url = preg_replace('/\{([a-zA-Z0-9_]+)\}/', '(?P<\1>[a-zA-Z0-9_-]+)', $url);
         self::$routes[] = [
             "method" => $method,
-            "url" => $url,
+            "url" => '#^' . $url . '$#',
             "callback" => $callback
         ];
     }
@@ -21,11 +22,13 @@ class Router
         $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
         foreach (self::$routes as $route) {
-            if ($route['method'] == $method && $route['url'] === $uri) {
-                return call_user_func(callback: $route['callback']);
+            if ($route['method'] == $method && preg_match($route['url'], $uri, $matches)) {
+                
+                $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
+                return call_user_func_array($route['callback'], $params);
             }
         }
-        
+
         http_response_code(404);
         echo json_encode(
             [

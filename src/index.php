@@ -13,4 +13,8 @@ Router::get('/hello', function () use ($products) {
     echo $products->getAllProducts();
 });
 
+Router::get('/products/{id}', function ($id){
+   echo $id;
+});
+
 Router::resolve();
