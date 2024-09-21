@@ -23,15 +23,15 @@ O banco de dados utilizado é o SQLite. Para facilitar a criação e manipulaç�
 - **descricao** (TEXT)
 - **preco** (REAL, obrigatório, valor positivo)
 - **estoque** (INTEGER, obrigatório, maior ou igual a 0)
-- **userInsert** (TEXT, obrigatório)
+- **userInsert** (INTEGER, obrigatório, FK PARA USUÁRIOS)
 - **data_hora** (DATETIME, obrigatório)
 
 #### Log
 - **id** (INTEGER, PK)
 - **acao** (TEXT, obrigatório, valores: 'CREATE', 'UPDATE', 'DELETE')
 - **data_hora** (DATETIME, obrigatório)
-- **produto_id** (INTEGER, FK para Produto)
-- **userInsert** (TEXT, obrigatório)
+- **produto_id** (INTEGER, FK PARA PRODUTOS)
+- **userInsert** (INTEGER, obrigatório, FK PARA USUÁRIOS)
 
 ### User
 - **id** (INTEGER, PK)
