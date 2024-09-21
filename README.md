@@ -33,6 +33,14 @@ O banco de dados utilizado é o SQLite. Para facilitar a criação e manipulaç�
 - **produto_id** (INTEGER, FK para Produto)
 - **userInsert** (TEXT, obrigatório)
 
+### User
+- **id** (INTEGER, PK)
+- **nome** (TEXT)
+- **email** (TEXT)
+- **senha** (TEXT)
+- **role** (ENUM("ADMIN", "USER"))
+- **creationDate** (ISOSTRING)
+
 ## Endpoints
 
 ### Produtos
