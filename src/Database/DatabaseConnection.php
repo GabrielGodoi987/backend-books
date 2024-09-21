@@ -9,11 +9,12 @@ use PDOException;
 class DatabaseConnection
 {
     private $pdo;
+    private static $instance;
 
     public function connect()
     {
         try {
-            $this->pdo = new PDO("sqlite:" . ConfigurationsType::$sqliteConnection);
+            $this->pdo = new PDO("sqlite:" . ConfigurationsType::$sqliteConnection, null, null, [PDO::ATTR_PERSISTENT => true]);
             echo json_encode(
                 [
                     "msg" => "connectionn was fully established",
@@ -21,7 +22,7 @@ class DatabaseConnection
                 ]
             );
         } catch (PDOException $e) {
-
+            print_r($e);
             echo json_encode(
                 [
                     "msg" => "Error to connect to the database, please make sure if is everything okay before initialize the server!",
@@ -31,7 +32,11 @@ class DatabaseConnection
         }
     }
 
-    public function getPdoConnection() {
-        return $this->pdo;
+   
+    public static function getInstance() {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        return self::$instance->pdo;
     }
 }
