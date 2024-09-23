@@ -2,7 +2,6 @@
 
 namespace Backend\Products\Database;
 
-use Backend\Products\Database\Config\ConfigurationsType;
 use PDO;
 use PDOException;
 
@@ -11,29 +10,23 @@ class DatabaseConnection
     private $pdo;
     private static $instance;
 
-    public function connect()
+    public function __construct()
     {
+        $config = require __DIR__ . '/ConfigurationsType.php';
+
+        $sqlitePath = $config['sqlite'];
+
         try {
-            $this->pdo = new PDO("sqlite:" . ConfigurationsType::$sqliteConnection, null, null, [PDO::ATTR_PERSISTENT => true]);
-            echo json_encode(
-                [
-                    "msg" => "connectionn was fully established",
-                    "status" => "success",
-                ]
-            );
+            $this->pdo = new PDO("sqlite:" . __DIR__ . '/' . $sqlitePath);
+            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
-            print_r($e);
-            echo json_encode(
-                [
-                    "msg" => "Error to connect to the database, please make sure if is everything okay before initialize the server!",
-                    "error" => $e->getMessage(),
-                ]
-            );
+            die("Erro de conexão com o banco de dados: " . $e->getMessage());
         }
     }
 
-   
-    public static function getInstance() {
+
+    public static function getInstance()
+    {
         if (self::$instance === null) {
             self::$instance = new self();
         }

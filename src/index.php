@@ -5,18 +5,24 @@ namespace Backend\Products;
 require "../vendor/autoload.php";
 
 use Backend\Products\Controller\ProductController;
+use Backend\Products\Controller\UserController;
 use Backend\Products\Routes\Router;
 use Backend\Products\Database\DatabaseConnection;
 
 $connection = new DatabaseConnection();
 
-// rota para testar conexão com o banco de dados
-Router::get('/connect', function () use ($connection) {
-    echo $connection->connect();
+$products = new ProductController();
+$user = new UserController();
+
+
+// user Routes
+Router::post("/createUSer", function () use ($user){
+  
 });
 
-$products = new ProductController();
 
+
+// products routes
 Router::get('/allProducts', function () use ($products) {
     echo $products->getAllProducts();
 });

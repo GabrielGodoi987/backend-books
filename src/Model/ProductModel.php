@@ -10,31 +10,21 @@ use PDOException;
 class ProductModel
 {
     private $connection;
-    private $table = 'Products';
+    private $table = 'Product';
 
     public function __construct()
     {
         $this->connection =  DatabaseConnection::getInstance();
     }
 
-    public function pdoTest()
-    {
-        $pdo = DatabaseConnection::getInstance();
-        // Agora, você pode executar a query
-        if ($pdo) {
-            $stmt = $pdo->query("SELECT * FROM table_name");
-        } else {
-            echo "A conexão com o banco de dados falhou!";
-        }
-    }
-
     public function getAllProducts()
     {
-        $query = "SELECT * FROM Product;";
+        $query = "SELECT * FROM " . $this->table . ";";
         try {
-            $dataQuery = $this->connection->query($query);
+            $dataQuery = $this->connection->prepare($query);
+            $dataQuery->execute();
             $data = $dataQuery->fetchAll(PDO::FETCH_ASSOC);
-            if (!empty($data)) {
+            if ($dataQuery->rowCount() >= 0) {
                 http_response_code(HttpEnum::OK);
                 return json_encode(
                     [
@@ -42,20 +32,12 @@ class ProductModel
                         "data" => $data
                     ]
                 );
-            } else {
-                http_response_code(response_code: HttpEnum::NO_CONTENT);
-                return json_encode(
-                    [
-                        "msg" => "Nenhum dado encontrado",
-                        "data" => []
-                    ]
-                );
-            }
+            } 
         } catch (\Throwable $th) {
             http_response_code(HttpEnum::SERVER_ERROR);
             return json_encode(
                 [
-                    "msg" => $th->getMessage(),
+                    "msg" => $th,
                     "error" => "Server error"
                 ]
             );
