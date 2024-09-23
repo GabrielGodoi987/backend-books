@@ -5,7 +5,6 @@ namespace Backend\Products\Model;
 use Backend\Products\Database\DatabaseConnection;
 use Backend\Products\Enum\HttpEnum;
 use PDOException;
-//INSERT INTO User(name, email, pass, creationDate) VALUES ();
 class UserModel
 {
     private $id;
@@ -82,5 +81,10 @@ class UserModel
                 ]
             );
         }
+    }
+
+    public function findUserEmail($email)
+    {
+        return $email;
     }
 }
