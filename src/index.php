@@ -17,21 +17,11 @@ $user = new UserController();
 
 
 // user Routes
-Router::post("/createUSer", function () use ($user) {
-    $userModel = new UserModel();
-    $name = json_decode(file_get_contents("php://input"), true);
-    $email = json_decode(file_get_contents("php://input"), true);
-    $pass = json_decode(file_get_contents("php://input"), true);
-
-    $userModel->setName($name);
-    $userModel->setEmail($email);
-    $userModel->setPass($pass);
-    echo $user->createUser($userModel);
+Router::post("/createUser", function () use ($user) {
+    $inputData = json_decode(file_get_contents("php://input"));
+    echo $user->createUser($inputData);
 });
 
-
-
-// products routes
 Router::get('/allProducts', function () use ($products) {
     echo $products->getAllProducts();
 });

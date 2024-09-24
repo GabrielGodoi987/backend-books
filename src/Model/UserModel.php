@@ -4,7 +4,9 @@ namespace Backend\Products\Model;
 
 use Backend\Products\Database\DatabaseConnection;
 use Backend\Products\Enum\HttpEnum;
+use DateTime;
 use PDOException;
+
 class UserModel
 {
     private $id;
@@ -55,31 +57,53 @@ class UserModel
 
     public function createUser(UserModel $user)
     {
+        $date = (new DateTime())->format('Y-m-d H:i:s');
         $name = $user->getName();
         $email = $user->getEmail();
         $pass = $user->getPass();
-        $query = "INSERT INTO User(name, email, pass, creationDate) VALUES (:name, :email, :pass, :creationDate);";
+        $query = 'INSERT INTO User(name, email, pass, creationDate) VALUES (:name, :email, :pass, :creationDate);';
         try {
             $dataQuery = $this->pdo->prepare($query);
             $dataQuery->bindParam(":name", $name);
             $dataQuery->bindParam(":email", $email);
             $dataQuery->bindParam(":pass", $pass);
+            $dataQuery->bindParam(":creationDate",  $date);
             $dataQuery->execute();
 
-            http_response_code(HttpEnum::CREATED);
-            echo json_encode(
-                [
-                    "msg" => "Usuário criado com sucessor",
-                    "data" => $dataQuery
-                ]
-            );
+            if (empty($name) && empty($email) && empty($pass)) {
+                http_response_code(HttpEnum::USERERROR);
+                echo json_encode(
+                    [
+                        "msg" => "Preencha todos os dados para cadastras-se",
+                        "fields" => "$name $email $pass estão vazios"
+                    ]
+                );
+                return;
+            } else {
+                http_response_code(HttpEnum::CREATED);
+                echo json_encode(
+                    [
+                        "msg" => "Usuário criado com sucessor",
+                        "data" => $dataQuery
+                    ]
+                );
+            }
         } catch (PDOException $th) {
             http_response_code(HttpEnum::SERVER_ERROR);
             echo json_encode(
                 [
-                    "msg" => $th->getMessage()
+                    "msg" => $th->getMessage(),
+                    "query" => $query
                 ]
             );
+        }
+    }
+
+    public function getAllUsers() {
+        try {
+            //code...
+        } catch (\Throwable $th) {
+            //throw $th;
         }
     }
 
