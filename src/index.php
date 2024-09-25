@@ -17,7 +17,7 @@ $logs = new LogsController();
 $user = new UserController();
 
 // products Routes
-Router::get('/allProducts', function () use ($products) {
+Router::get('/produtos', function () use ($products) {
     echo $products->getAllProducts();
 });
 
@@ -29,17 +29,18 @@ Router::delete("/products/delete/{id}", function ($id) use ($products) {
     echo $id;
 });
 
-Router::post("/products/create", function () use ($products) {
+Router::post("/produtos/create", function () use ($products) {
     $inputData = json_decode(file_get_contents("php://input"));
     echo $products->createProduct($inputData);
 });
 
 Router::put("/products/update", function () use ($products) {
-    echo "Pesquisar se o produto existe e enviar os dados de atualização dele";
+    $inputData = json_decode(file_get_contents("php://input"));
+    echo $products->updateProduct($inputData);
 });
 
 //logs Routes
-Router::get('/allLogs', function () use ($logs) {
+Router::get('/alllogs', function () use ($logs) {
     echo $logs->getAllLogs();
 });
 

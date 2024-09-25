@@ -7,7 +7,6 @@ use Backend\Products\Enum\HttpEnum;
 use DateTime;
 use PDO;
 use PDOException;
-use PDORow;
 
 class ProductModel
 {
@@ -21,8 +20,6 @@ class ProductModel
     private $stock;
     private $userInsert;
     private $date_time;
-
-    private $logsController;
 
     public function __construct()
     {
@@ -76,6 +73,10 @@ class ProductModel
     public function setUserInsert($userInsert)
     {
         $this->userInsert = $userInsert;
+    }
+    public function getDateTime()
+    {
+        return $this->date_time = (new DateTime())->format('Y-m-d H:i:s');
     }
     public function getAllProducts()
     {
@@ -163,12 +164,12 @@ class ProductModel
         $description = $data->getDescription();
         $price = $data->getPrice();
         $stock = $data->getStock();
-        $date_time = (new DateTime())->format('Y-m-d H:i:s');
+        $date_time = $data->getDateTime();
         $userInsert = $data->getUserInsert();
         $query = "INSERT INTO Product(name, description, price, stock, date_time, userInsert) VALUES (:name, :description, :price, :stock, :date_time, :userInsert)";
         try {
             // faz as devidas verificações
-            if (!isset($name, $description, $price, $stock, $date_time, $userInsert) && strlen($name) > 3 && $stock > 0) {
+            if (isset($name, $description, $price, $stock, $date_time, $userInsert) && strlen($name) >= 3 && $stock > 0) {
                 $ProductExists = $this->findProductByName($name);
 
                 // se o usuário existir ele vai dar erro!
@@ -218,16 +219,42 @@ class ProductModel
     {
         $query = "UPDATE Product SET name = :name, description = :description, price = :price, stock = :stock, userInsert = :userInsert, date_time = :date_time";
         try {
-            if (!isset($data)) {
+            $name = $data->getName();
+            $description = $data->getDescription();
+            $price = $data->getPrice();
+            $stock = $data->getStock();
+            $date_time = $data->getDateTime();
+            $userInsert = $data->getUserInsert();
+            if (!isset($name) || !isset($description) || !isset($price) || !isset($stock) || !isset($date_time) || !isset($userInsert)) {
                 $query = $this->connection->prepare($query);
+                $query->bindParam(":name", $name);
+                $query->bindParam(":description", $description);
+                $query->bindParam(":price", $price);
+                $query->bindParam(":stock", $stock);
+                $query->bindParam(":date_time", $date_time);
+                $query->bindParam(":userInsert", $userInsert);
                 $query->execute($data);
+
+                http_response_code(HttpEnum::OK);
+                return json_encode(
+                    [
+                        "msg" => "Produto atualizado com sucesso",
+                        "data" => $query
+                    ]
+                );
             }
+            http_response_code(HttpEnum::USERERROR);
+            return json_encode(
+                [
+                    "msg" => "dados insuficientes"
+                ]
+                );
         } catch (PDOException $e) {
             http_response_code(HttpEnum::SERVER_ERROR);
             return json_encode(
                 [
                     "msg" => "Erro de servidor ao atualizar produto",
-                    "error"=> $e->getMessage()
+                    "error" => $e->getMessage()
                 ]
             );
         }

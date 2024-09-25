@@ -66,13 +66,13 @@ class LogsModel
     }
     public function createLog($productData, $action)
     {
-        $query = "INSERT INTO Logs(productaction, creationDate, userInsert, productId) VALUES (:productaction, :creationDate, :userInsert, :productId);";
+        $query = "INSERT INTO Logs(productAction, creationDate, userInsert, productId) VALUES (:productAction, :creationDate, :userInsert, :productId);";
         $idProduct = $productData->getIdProduct();
-        $dateTime = $productData->getDateTime();
+        $dateTime =  $productData->getDateTime();
         $userInsert = $productData->getUserInsert();
         try {
             $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(":productAction", strtoupper($action));
+            $stmt->bindParam(":productAction", $action);
             $stmt->bindParam(":creationDate", $dateTime);
             $stmt->bindParam(":userInsert", $userInsert);
             $stmt->bindParam(":productId", $idProduct);
@@ -85,6 +85,6 @@ class LogsModel
 
     public function findLogOfAProduct($productId)
     {
-        $query = "";
+        $query = "SELECT * FROM Logs WHERE Logs.productId = $productId LEFT OUTER JOIN Logs.productID == Product.id";
     }
 }
