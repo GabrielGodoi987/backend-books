@@ -4,30 +4,43 @@ namespace Backend\Products;
 
 require "../vendor/autoload.php";
 
+use Backend\Products\Controller\LogsController;
 use Backend\Products\Controller\ProductController;
 use Backend\Products\Controller\UserController;
-use Backend\Products\Model\UserModel;
 use Backend\Products\Routes\Router;
 use Backend\Products\Database\DatabaseConnection;
 
 $connection = new DatabaseConnection();
 
 $products = new ProductController();
+$logs = new LogsController();
 $user = new UserController();
 
-
-// user Routes
-Router::post("/createUser", function () use ($user) {
-    $inputData = json_decode(file_get_contents("php://input"));
-    echo $user->createUser($inputData);
-});
-
+// products Routes
 Router::get('/allProducts', function () use ($products) {
     echo $products->getAllProducts();
 });
 
-Router::get('/products/{id}', function ($id) use ($products) {
+Router::get('/products/find/{id}', function ($id) use ($products) {
+    echo $products->getProductById($id);
+});
+
+Router::delete("/products/delete/{id}", function ($id) use ($products) {
     echo $id;
+});
+
+Router::post("/products/create", function () use ($products) {
+    $inputData = json_decode(file_get_contents("php://input"));
+    echo $products->createProduct($inputData);
+});
+
+Router::put("/products/update", function () use ($products) {
+    echo "Pesquisar se o produto existe e enviar os dados de atualização dele";
+});
+
+//logs Routes
+Router::get('/allLogs', function () use ($logs) {
+    echo $logs->getAllLogs();
 });
 
 Router::resolve();

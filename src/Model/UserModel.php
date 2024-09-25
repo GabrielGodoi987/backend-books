@@ -50,11 +50,7 @@ class UserModel
     {
         $this->pass = $pass;
     }
-    public function getCreationDate()
-    {
-        return $this->creationDate = new \DateTime();
-    }
-
+    
     public function createUser(UserModel $user)
     {
         $date = (new DateTime())->format('Y-m-d H:i:s');
