@@ -34,9 +34,9 @@ Router::post("/produtos/create", function () use ($products) {
     echo $products->createProduct($inputData);
 });
 
-Router::put("/products/update", function () use ($products) {
+Router::put("/products/update/{id}", function ($id) use ($products) {
     $inputData = json_decode(file_get_contents("php://input"));
-    echo $products->updateProduct($inputData);
+    echo $products->updateProduct($inputData, $id);
 });
 
 //logs Routes

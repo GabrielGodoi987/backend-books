@@ -215,9 +215,9 @@ class ProductModel
         }
     }
 
-    public function updateProduct($data)
+    public function updateProduct($data, $id)
     {
-        $query = "UPDATE Product SET name = :name, description = :description, price = :price, stock = :stock, userInsert = :userInsert, date_time = :date_time";
+        $query = "UPDATE Product SET name = :name, description = :description, price = :price, stock = :stock, userInsert = :userInsert, date_time = :date_time Where Product.id == :id";
         try {
             $name = $data->getName();
             $description = $data->getDescription();
@@ -225,7 +225,7 @@ class ProductModel
             $stock = $data->getStock();
             $date_time = $data->getDateTime();
             $userInsert = $data->getUserInsert();
-            if (!isset($name) || !isset($description) || !isset($price) || !isset($stock) || !isset($date_time) || !isset($userInsert)) {
+            if (isset($name) || !isset($description) || !isset($price) || !isset($stock) || !isset($date_time) || !isset($userInsert)) {
                 $query = $this->connection->prepare($query);
                 $query->bindParam(":name", $name);
                 $query->bindParam(":description", $description);
@@ -233,7 +233,7 @@ class ProductModel
                 $query->bindParam(":stock", $stock);
                 $query->bindParam(":date_time", $date_time);
                 $query->bindParam(":userInsert", $userInsert);
-                $query->execute($data);
+                $query->execute();
 
                 http_response_code(HttpEnum::OK);
                 return json_encode(

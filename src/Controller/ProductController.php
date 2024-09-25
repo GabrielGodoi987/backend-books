@@ -47,7 +47,18 @@ class ProductController
             echo json_encode(["msg" => "Erro ao criar log", "err" => $createLog]);
     }
 
-    public function updateProduct($product) {}
+    public function updateProduct($product, $id) {
+        $this->productsModel->setName($product->name);
+        $this->productsModel->setDescription($product->description);
+        $this->productsModel->setPrice($product->price);
+        $this->productsModel->setStock($product->stock);
+        $this->productsModel->setUserInsert($product->userInsert);
+        $createLog = $this->logsModel->createLog($this->productsModel, LogsEnum::UPDATE);
+        if ($createLog)
+            echo $this->productsModel->updateProduct($this->productsModel, $id);
+        else
+            echo json_encode(["msg" => "Erro ao criar log", "err" => $createLog]);
+    }
     public function deleteProduct($id) {}
 
     public function findProductByName() {}
