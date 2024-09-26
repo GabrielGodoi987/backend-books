@@ -108,7 +108,7 @@ class ProductModel
         $date_time = $data->getDateTime();
         $userInsert = $data->getUserInsert();
 
-        if (empty($name) || empty($description) || empty($price) || empty($stock) || empty($userInsert)) {
+        if (empty($name) && strlen($name) >= 3 && empty($description) && empty($price) && empty($stock) && empty($userInsert)) {
             http_response_code(HttpEnum::USERERROR);
             return json_encode(["msg" => "Dados insuficientes"]);
         }
