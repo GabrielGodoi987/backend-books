@@ -86,5 +86,21 @@ class LogsModel
     public function findLogOfAProduct($productId)
     {
         $query = "SELECT * FROM Logs WHERE Logs.productId = $productId LEFT OUTER JOIN Logs.productID == Product.id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            return json_encode(
+                [
+                    "data" => $result
+                ]
+            );
+        } catch (PDOException $th) {
+            return json_encode(
+                [
+                    "error" => $th->getMessage()
+                ]
+            );
+        }
     }
 }
