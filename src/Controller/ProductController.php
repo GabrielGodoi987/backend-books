@@ -40,14 +40,19 @@ class ProductController
         $this->productsModel->setPrice($product->price);
         $this->productsModel->setStock($product->stock);
         $this->productsModel->setUserInsert($product->userInsert);
-        $createLog = $this->logsModel->createLog($this->productsModel, LogsEnum::CREATION);
+
+        $createProductResult = $this->productsModel->createProduct($this->productsModel);
+
+        if ($createProductResult)
+            $createLog = $this->logsModel->createLog($this->productsModel, LogsEnum::CREATION);
         if ($createLog)
-            echo $this->productsModel->createProduct($this->productsModel);
+            echo $createProductResult;
         else
-            echo json_encode(["msg" => "Erro ao criar log", "err" => $createLog]);
+            echo json_encode(["msg" => "Erro ao cadastrar novo produto"]);
     }
 
-    public function updateProduct($product, $id) {
+    public function updateProduct($product, $id)
+    {
         $this->productsModel->setName($product->name);
         $this->productsModel->setDescription($product->description);
         $this->productsModel->setPrice($product->price);

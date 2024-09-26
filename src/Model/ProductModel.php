@@ -160,64 +160,8 @@ class ProductModel
 
     public function createProduct($data)
     {
-        $name = $data->getName();
-        $description = $data->getDescription();
-        $price = $data->getPrice();
-        $stock = $data->getStock();
-        $date_time = $data->getDateTime();
-        $userInsert = $data->getUserInsert();
-        $query = "INSERT INTO Product(name, description, price, stock, date_time, userInsert) VALUES (:name, :description, :price, :stock, :date_time, :userInsert)";
-        try {
-            // faz as devidas verificações
-            if (isset($name, $description, $price, $stock, $date_time, $userInsert) && strlen($name) >= 3 && $stock > 0) {
-                $ProductExists = $this->findProductByName($name);
+        $query = "INSERT INTO Product (name, description, price, stock, userInsert, date_time) VALUES (:name, :description, :price, :stock, :userInsert, :date_time)";
 
-                // se o usuário existir ele vai dar erro!
-                if ($ProductExists) {
-                    http_response_code(HttpEnum::SERVER_ERROR);
-                    return json_encode(
-                        [
-                            "msg" => "O produto $name já existe",
-                            "data" => $ProductExists
-                        ]
-                    );
-                }
-                $dataQuery = $this->connection->prepare($query);
-                $dataQuery->bindParam(":name", $name);
-                $dataQuery->bindParam(":description", $description);
-                $dataQuery->bindParam(":price", $price);
-                $dataQuery->bindParam(":stock", $stock);
-                $dataQuery->bindParam(":date_time", $date_time);
-                $dataQuery->bindParam(":userInsert", $userInsert);
-                $dataQuery->execute();
-                http_response_code(HttpEnum::CREATED);
-                return json_encode(
-                    [
-                        "msg" => "Produto criado com sucesso",
-                        "data" => $dataQuery
-                    ]
-                );
-            }
-            http_response_code(HttpEnum::USERERROR);
-            return json_encode(
-                [
-                    "msg" => "Dados incompletos"
-                ]
-            );
-        } catch (PDOException $th) {
-            http_response_code(HttpEnum::SERVER_ERROR);
-            return json_encode(
-                [
-                    "msg" => "Erro de servidor ao criar novo produto",
-                    "error" => $th->getMessage()
-                ]
-            );
-        }
-    }
-
-    public function updateProduct($data, $id)
-    {
-        $query = "UPDATE Product SET name = :name, description = :description, price = :price, stock = :stock, userInsert = :userInsert, date_time = :date_time Where Product.id == :id";
         try {
             $name = $data->getName();
             $description = $data->getDescription();
@@ -225,7 +169,10 @@ class ProductModel
             $stock = $data->getStock();
             $date_time = $data->getDateTime();
             $userInsert = $data->getUserInsert();
-            if (isset($name) || !isset($description) || !isset($price) || !isset($stock) || !isset($date_time) || !isset($userInsert)) {
+
+            if (isset($name) && isset($description) && isset($price) && isset($stock) && isset($date_time) && isset($userInsert)) {
+
+                // Insere o novo produto
                 $query = $this->connection->prepare($query);
                 $query->bindParam(":name", $name);
                 $query->bindParam(":description", $description);
@@ -235,20 +182,89 @@ class ProductModel
                 $query->bindParam(":userInsert", $userInsert);
                 $query->execute();
 
+                $productId = $this->connection->lastInsertId();
+
+                $querySelect = "SELECT * FROM Product WHERE id = :id";
+                $stmt = $this->connection->prepare($querySelect);
+                $stmt->bindParam(":id", $productId);
+                $stmt->execute();
+                $newProduct = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                http_response_code(HttpEnum::OK);
+                return json_encode(
+                    [
+                        "msg" => "Produto criado com sucesso",
+                        "data" => $newProduct
+                    ]
+                );
+            }
+
+            http_response_code(HttpEnum::USERERROR);
+            return json_encode(
+                [
+                    "msg" => "Dados insuficientes"
+                ]
+            );
+        } catch (PDOException $e) {
+            http_response_code(HttpEnum::SERVER_ERROR);
+            return json_encode(
+                [
+                    "msg" => "Erro de servidor ao criar produto",
+                    "error" => $e->getMessage()
+                ]
+            );
+        }
+    }
+
+
+    public function updateProduct($data, $id)
+    {
+        $query = "UPDATE Product SET name = :name, description = :description, price = :price, stock = :stock, userInsert = :userInsert, date_time = :date_time WHERE id = :id";
+
+        try {
+            $name = $data->getName();
+            $description = $data->getDescription();
+            $price = $data->getPrice();
+            $stock = $data->getStock();
+            $date_time = $data->getDateTime();
+            $userInsert = $data->getUserInsert();
+            if (isset($name) && isset($description) && isset($price) && isset($stock) && isset($date_time) && isset($userInsert)) {
+
+                // Prepara e executa a query de update
+                $query = $this->connection->prepare($query);
+                $query->bindParam(":name", $name);
+                $query->bindParam(":description", $description);
+                $query->bindParam(":price", $price);
+                $query->bindParam(":stock", $stock);
+                $query->bindParam(":date_time", $date_time);
+                $query->bindParam(":userInsert", $userInsert);
+                $query->bindParam(":id", $id);
+                $query->execute();
+
+
+                $querySelect = "SELECT * FROM Product WHERE id = :id";
+                $stmt = $this->connection->prepare($querySelect);
+                $stmt->bindParam(":id", $id);
+                $stmt->execute();
+                $updatedProduct = $stmt->fetch(PDO::FETCH_ASSOC);
+
+
                 http_response_code(HttpEnum::OK);
                 return json_encode(
                     [
                         "msg" => "Produto atualizado com sucesso",
-                        "data" => $query
+                        "data" => $updatedProduct
                     ]
                 );
             }
+
+            // Caso algum dado esteja faltando
             http_response_code(HttpEnum::USERERROR);
             return json_encode(
                 [
-                    "msg" => "dados insuficientes"
+                    "msg" => "Dados insuficientes"
                 ]
-                );
+            );
         } catch (PDOException $e) {
             http_response_code(HttpEnum::SERVER_ERROR);
             return json_encode(
@@ -259,6 +275,7 @@ class ProductModel
             );
         }
     }
+
     public function deleteProductById($id)
     {
         $query = "DELETE FROM Product where Product.id == $id";

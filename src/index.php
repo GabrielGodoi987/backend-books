@@ -40,7 +40,7 @@ Router::put("/products/update/{id}", function ($id) use ($products) {
 });
 
 //logs Routes
-Router::get('/alllogs', function () use ($logs) {
+Router::get('/logs', function () use ($logs) {
     echo $logs->getAllLogs();
 });
 
