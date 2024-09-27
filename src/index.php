@@ -17,24 +17,24 @@ $logs = new LogsController();
 $user = new UserController();
 
 // products Routes
-Router::get('/produtos', function () use ($products) {
+Router::get('/product', function () use ($products) {
     echo $products->getAllProducts();
 });
 
-Router::get('/products/find/{id}', function ($id) use ($products) {
+Router::get('/product/find/{id}', function ($id) use ($products) {
     echo $products->getProductById($id);
 });
 
-Router::delete("/products/delete/{id}", function ($id) use ($products) {
+Router::delete("/product/delete/{id}", function ($id) use ($products) {
     echo $products->deleteProduct($id);
 });
 
-Router::post("/produtos/create", function () use ($products) {
+Router::post("/product/create", function () use ($products) {
     $inputData = json_decode(file_get_contents("php://input"));
     echo $products->createProduct($inputData);
 });
 
-Router::put("/products/update/{id}", function ($id) use ($products) {
+Router::put("/product/update/{id}", function ($id) use ($products) {
     $inputData = json_decode(file_get_contents("php://input"));
     echo $products->updateProduct($inputData, $id);
 });
