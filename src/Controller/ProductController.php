@@ -41,17 +41,7 @@ class ProductController
         $this->productsModel->setStock($product->stock);
         $this->productsModel->setUserInsert($product->userInsert);
 
-        $createProductResult = $this->productsModel->createProduct($this->productsModel);
-
-        if ($createProductResult) {
-
-            $createLog = $this->logsModel->createLog($this->productsModel, LogsEnum::CREATION);
-            if ($createLog) {
-                echo $createProductResult;
-            } else {
-                echo json_encode(["msg" => "Erro ao cadastrar novo produto"]);
-            }
-        }
+        echo $this->productsModel->createProduct($this->productsModel);
     }
 
     public function updateProduct($product, $id)
@@ -61,14 +51,12 @@ class ProductController
         $this->productsModel->setPrice($product->price);
         $this->productsModel->setStock($product->stock);
         $this->productsModel->setUserInsert($product->userInsert);
-        $createLog = $this->logsModel->createLog($this->productsModel, LogsEnum::UPDATE);
-        if ($createLog) {
-            echo $this->productsModel->updateProduct($this->productsModel, $id);
-        } else {
-            echo json_encode(["msg" => "Erro ao criar log", "err" => $createLog]);
-        }
+
+        echo $this->productsModel->updateProduct($this->productsModel, $id);
     }
-    public function deleteProduct($id) {}
+    public function deleteProduct($id) {
+        echo $this->productsModel->deleteProductById($id);
+    }
 
     public function findProductByName() {}
 }

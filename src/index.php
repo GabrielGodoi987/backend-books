@@ -26,7 +26,7 @@ Router::get('/products/find/{id}', function ($id) use ($products) {
 });
 
 Router::delete("/products/delete/{id}", function ($id) use ($products) {
-    echo $id;
+    echo $products->deleteProduct($id);
 });
 
 Router::post("/produtos/create", function () use ($products) {
@@ -42,6 +42,10 @@ Router::put("/products/update/{id}", function ($id) use ($products) {
 //logs Routes
 Router::get('/logs', function () use ($logs) {
     echo $logs->getAllLogs();
+});
+
+Router::get("/logproduct/{id}", function ($id) use ($logs) {
+    echo $logs->getLogById($id);
 });
 
 Router::resolve();

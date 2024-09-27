@@ -1,8 +1,10 @@
 <?php
+
 namespace Backend\Products\Model;
 
 use Backend\Products\Database\DatabaseConnection;
 use Backend\Products\Enum\HttpEnum;
+use Backend\Products\Enum\LogsEnum;
 use DateTime;
 use PDO;
 use PDOException;
@@ -19,25 +21,66 @@ class ProductModel
     private $stock;
     private $userInsert;
     private $date_time;
+    private $logsModel;
 
     public function __construct()
     {
         $this->connection =  DatabaseConnection::getInstance();
+        $this->logsModel = new LogsModel();
     }
 
-    public function getIdProduct() { return $this->idProduct; }
-    public function setIdProduct($idProduct) { $this->idProduct = $idProduct; }
-    public function getName() { return $this->name; }
-    public function setName($name) { $this->name = $name; }
-    public function getDescription() { return $this->description; }
-    public function setDescription($description) { $this->description = $description; }
-    public function getPrice() { return $this->price; }
-    public function setPrice($price) { $this->price = $price; }
-    public function getStock() { return $this->stock; }
-    public function setStock($stock) { $this->stock = $stock; }
-    public function getUserInsert() { return $this->userInsert; }
-    public function setUserInsert($userInsert) { $this->userInsert = $userInsert; }
-    public function getDateTime() { return (new DateTime())->format('Y-m-d H:i:s'); }
+    public function getIdProduct()
+    {
+        return $this->idProduct;
+    }
+    public function setIdProduct($idProduct)
+    {
+        $this->idProduct = $idProduct;
+    }
+    public function getName()
+    {
+        return $this->name;
+    }
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+    public function getDescription()
+    {
+        return $this->description;
+    }
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+    public function getPrice()
+    {
+        return $this->price;
+    }
+    public function setPrice($price)
+    {
+        $this->price = $price;
+    }
+    public function getStock()
+    {
+        return $this->stock;
+    }
+    public function setStock($stock)
+    {
+        $this->stock = $stock;
+    }
+    public function getUserInsert()
+    {
+        return $this->userInsert;
+    }
+    public function setUserInsert($userInsert)
+    {
+        $this->userInsert = $userInsert;
+    }
+    public function getDateTime()
+    {
+        return (new DateTime())->format('Y-m-d H:i:s');
+    }
 
     public function getAllProducts()
     {
@@ -98,7 +141,6 @@ class ProductModel
             ]);
         }
     }
-
     public function createProduct($data)
     {
         $name = $data->getName();
@@ -108,12 +150,11 @@ class ProductModel
         $date_time = $data->getDateTime();
         $userInsert = $data->getUserInsert();
 
-        if (empty($name) && strlen($name) >= 3 && empty($description) && empty($price) && empty($stock) && empty($userInsert)) {
+        if (empty($name) && strlen($name) < 3 && empty($description) && empty($price) && empty($stock) && empty($userInsert)) {
             http_response_code(HttpEnum::USERERROR);
             return json_encode(["msg" => "Dados insuficientes"]);
         }
 
-        // Verifica se o produto já existe
         $existingProduct = $this->findProductByName($name);
         if ($existingProduct) {
             http_response_code(HttpEnum::USERERROR);
@@ -137,6 +178,9 @@ class ProductModel
             $stmt->execute();
 
             $productId = $this->connection->lastInsertId();
+
+            $this->logsModel->createLog($data, $productId, LogsEnum::CREATION);
+
             return $this->getProductById($productId);
         } catch (PDOException $e) {
             http_response_code(HttpEnum::SERVER_ERROR);
@@ -146,6 +190,7 @@ class ProductModel
             ]);
         }
     }
+
 
     public function updateProduct($data, $id)
     {
@@ -165,7 +210,7 @@ class ProductModel
                   SET name = :name, description = :description, price = :price, 
                       stock = :stock, userInsert = :userInsert, date_time = :date_time 
                   WHERE id = :id";
-        
+
         try {
             $stmt = $this->connection->prepare($query);
             $stmt->bindParam(':name', $name);
@@ -176,6 +221,8 @@ class ProductModel
             $stmt->bindParam(':date_time', $date_time);
             $stmt->bindParam(':id', $id);
             $stmt->execute();
+
+            $this->logsModel->createLog($data, $id, LogsEnum::UPDATE);
 
             return $this->getProductById($id);
         } catch (PDOException $e) {
@@ -191,9 +238,24 @@ class ProductModel
     {
         $query = "DELETE FROM Product WHERE id = :id";
         try {
+            // Buscar o produto e decodificar o JSON
+            $findProduct = json_decode($this->getProductById($id), true);
+
+            // Verificar se o produto existe
+            if (empty($findProduct['data'])) {
+                http_response_code(HttpEnum::USERERROR);
+                return json_encode([
+                    "msg" => "O produto não existe em nossa base de dados",
+                ]);
+            }
+
             $stmt = $this->connection->prepare($query);
             $stmt->bindParam(':id', $id, PDO::PARAM_INT);
             $stmt->execute();
+
+            // Criar o log da exclusão
+            $this->logsModel->createLog($findProduct['data'], $id, LogsEnum::DELETE);
+
             http_response_code(HttpEnum::OK);
             return json_encode(["msg" => "Produto deletado com sucesso"]);
         } catch (PDOException $e) {

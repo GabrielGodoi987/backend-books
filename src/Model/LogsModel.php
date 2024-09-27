@@ -64,32 +64,35 @@ class LogsModel
             );
         }
     }
-    public function createLog($productData, $action)
+    public function createLog($productData, $productId, $action)
     {
-        $query = "INSERT INTO Logs(productAction, creationDate, userInsert, productId) VALUES (:productAction, :creationDate, :userInsert, :productId);";
-        $idProduct = $productData->getIdProduct();
+        $query = "INSERT INTO Logs (productAction, creationDate, userInsert, productId) 
+                  VALUES (:productAction, :creationDate, :userInsert, :productId)";
         $dateTime =  $productData->getDateTime();
         $userInsert = $productData->getUserInsert();
+
         try {
             $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(":productAction", $action);
+            $stmt->bindParam(":productAction", $action, PDO::PARAM_STR);
+            $stmt->bindParam(":productId", $productId, PDO::PARAM_INT);
             $stmt->bindParam(":creationDate", $dateTime);
-            $stmt->bindParam(":userInsert", $userInsert);
-            $stmt->bindParam(":productId", $idProduct);
+            $stmt->bindParam(":userInsert", $userInsert, PDO::PARAM_STR);
             $stmt->execute();
-            return $productData;
+            return true;
         } catch (PDOException $e) {
-            return $e->getMessage();
+            return false;
         }
     }
 
     public function findLogOfAProduct($productId)
     {
-        $query = "SELECT * FROM Logs WHERE Logs.productId = $productId LEFT OUTER JOIN Logs.productID == Product.id";
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute();
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $query = "SELECT * FROM Logs LEFT JOIN Product ON Logs.productId = Product.id WHERE Logs.productId = :productId;";
+        
         try {
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(":productId", $productId, PDO::PARAM_INT);
+            $stmt->execute();
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
             return json_encode(
                 [
                     "data" => $result

@@ -18,11 +18,6 @@ class LogsController
         echo $this->logsModel->getAllLogs();
     }
 
-    public function createNewLog($productData)
-    {
-        echo $this->logsModel->createLog($productData, LogsEnum::CREATION);
-    }
-
     public function getLogById($productId)
     {
         echo $this->logsModel->findLogOfAProduct($productId);
