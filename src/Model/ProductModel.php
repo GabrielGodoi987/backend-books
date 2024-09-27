@@ -236,28 +236,32 @@ class ProductModel
 
     public function deleteProductById($id)
     {
-        $query = "DELETE FROM Product WHERE id = :id";
+        $query = "DELETE FROM Product WHERE Product.id = :id";
         try {
-            // Buscar o produto e decodificar o JSON
             $findProduct = json_decode($this->getProductById($id), true);
 
-            // Verificar se o produto existe
-            if (empty($findProduct['data'])) {
+            if (!$findProduct || empty($findProduct['data'])) {
                 http_response_code(HttpEnum::USERERROR);
                 return json_encode([
                     "msg" => "O produto não existe em nossa base de dados",
                 ]);
             }
 
+            $product = new ProductModel();
+            $product->setUserInsert($findProduct['data']['userInsert']);
+
             $stmt = $this->connection->prepare($query);
             $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-            $stmt->execute();
 
-            // Criar o log da exclusão
-            $this->logsModel->createLog($findProduct['data'], $id, LogsEnum::DELETE);
+            $stmt->execute();
+       
+            $this->logsModel->createLog($product, $id, LogsEnum::DELETE);
 
             http_response_code(HttpEnum::OK);
-            return json_encode(["msg" => "Produto deletado com sucesso"]);
+            return json_encode([
+                "msg" => "Produto deletado com sucesso",
+                "userInsert" => $findProduct
+            ]);
         } catch (PDOException $e) {
             http_response_code(HttpEnum::SERVER_ERROR);
             return json_encode([
