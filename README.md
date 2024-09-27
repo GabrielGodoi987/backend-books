@@ -38,17 +38,17 @@ O banco de dados utilizado é o SQLite. Para facilitar a criação e manipulaç�
 ### Produtos
 
 #### 1. Listar todos os produtos
-**GET /produtos**
+**GET /product**
 
 Retorna uma lista com todos os produtos cadastrados.
 
 #### 2. Obter produto por ID
-**GET /produtos/{id}**
+**GET /product/{id}**
 
 Retorna os detalhes de um produto específico com base no ID fornecido.
 
 #### 3. Criar novo produto
-**POST /produtos**
+**POST /product/create**
 
 Cria um novo produto no banco de dados.
 
@@ -66,3 +66,30 @@ Cria um novo produto no banco de dados.
   "estoque": 10,
   "userInsert": "admin"
 }
+````
+
+#### 4. Deletar produto
+**DELETE /product/delete/{id}**
+
+Deleta o produto com base em seu ID.
+
+#### 5. Atualizar produto
+**PUT /product/update{id}**
+
+Atualiza um produto com base em seu ID.
+
+# Rota de Logs
+
+#### 1. Buscar todos os Logs
+**GET /logs**
+
+Buscar todos os Logs do sistema
+
+#### 2. Buscar Log de um produto
+**GET /logproduct/{id}**
+
+Busca o Log de um produto específico.
+
+
+
+
