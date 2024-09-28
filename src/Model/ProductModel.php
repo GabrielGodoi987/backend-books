@@ -236,7 +236,7 @@ class ProductModel
 
     public function deleteProductById($id)
     {
-        $query = "DELETE FROM Product WHERE Product.id = :id";
+        $query = "UPDATE Product SET isActive = 0 WHERE Product.id = :id";
         try {
             $findProduct = json_decode($this->getProductById($id), true);
 
