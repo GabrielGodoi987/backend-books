@@ -77,6 +77,7 @@ class ProductModel
     {
         $this->userInsert = $userInsert;
     }
+
     public function getDateTime()
     {
         return (new DateTime())->format('Y-m-d H:i:s');
@@ -84,7 +85,7 @@ class ProductModel
 
     public function getAllProducts()
     {
-        $query = "SELECT * FROM $this->table;";
+        $query = "SELECT * FROM $this->table WHERE Product.isActive == 1;";
         try {
             $stmt = $this->connection->prepare($query);
             $stmt->execute();
@@ -149,6 +150,7 @@ class ProductModel
         $stock = $data->getStock();
         $date_time = $data->getDateTime();
         $userInsert = $data->getUserInsert();
+        $createValue = 1;
 
         if (empty($name) && strlen($name) < 3 && empty($description) && empty($price) && empty($stock) && empty($userInsert)) {
             http_response_code(HttpEnum::USERERROR);
@@ -164,8 +166,8 @@ class ProductModel
             ]);
         }
 
-        $query = "INSERT INTO Product (name, description, price, stock, userInsert, date_time) 
-                  VALUES (:name, :description, :price, :stock, :userInsert, :date_time)";
+        $query = "INSERT INTO Product (name, description, price, stock, userInsert, date_time, isActive) 
+                  VALUES (:name, :description, :price, :stock, :userInsert, :date_time, :isActive)";
 
         try {
             $stmt = $this->connection->prepare($query);
@@ -175,6 +177,7 @@ class ProductModel
             $stmt->bindParam(':stock', $stock);
             $stmt->bindParam(':userInsert', $userInsert);
             $stmt->bindParam(':date_time', $date_time);
+            $stmt->bindParam(":isActive", $createValue);
             $stmt->execute();
 
             $productId = $this->connection->lastInsertId();
