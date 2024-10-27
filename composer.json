@@ -12,5 +12,7 @@
             "name": "Gabriel Godoi and Vitor Tavares"
         }
     ],
-    "require": {}
+    "require": {
+        "firebase/php-jwt": "^6.10"
+    }
 }

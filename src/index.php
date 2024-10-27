@@ -10,6 +10,12 @@ use Backend\Products\Controller\UserController;
 use Backend\Products\Routes\Router;
 use Backend\Products\Database\DatabaseConnection;
 
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: *");
+header("Access-Control-Allow-Methods: POST, OPTIONS, GET, PUT, DELETE");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Access-Control-Allow-Credentials: true");
+
 $connection = new DatabaseConnection();
 
 $products = new ProductController();

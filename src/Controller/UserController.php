@@ -45,4 +45,6 @@ class UserController
     {
         return $this->userModel->findUserEmail($data);
     }
+
+    public function  loginUSer($email, $password){}
 }

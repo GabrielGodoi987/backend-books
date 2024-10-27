@@ -95,6 +95,9 @@ class UserModel
         }
     }
 
+    public function getUserByEmail($email){}
+    public function getUserById($id){}
+
     public function getAllUsers() {
         try {
             //code...
