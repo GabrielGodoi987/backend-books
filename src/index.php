@@ -11,11 +11,15 @@ use Backend\Products\Routes\Router;
 use Backend\Products\Database\DatabaseConnection;
 
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: *");
-header("Access-Control-Allow-Methods: POST, OPTIONS, GET, PUT, DELETE");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS, PUT, DELETE");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Credentials: true");
 
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(204);
+    exit;
+}
+
+header('Content-Type: application/json');
 $connection = new DatabaseConnection();
 
 $products = new ProductController();

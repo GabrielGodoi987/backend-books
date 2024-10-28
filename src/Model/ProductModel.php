@@ -91,10 +91,7 @@ class ProductModel
             $stmt->execute();
             $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
             http_response_code(HttpEnum::OK);
-            return json_encode([
-                "msg" => "Dados buscados com sucesso",
-                "data" => $data
-            ]);
+            return json_encode($data);
         } catch (PDOException $e) {
             http_response_code(HttpEnum::SERVER_ERROR);
             return json_encode([
@@ -113,10 +110,7 @@ class ProductModel
             $stmt->execute();
             $data = $stmt->fetch(PDO::FETCH_ASSOC);
             http_response_code(HttpEnum::OK);
-            return json_encode([
-                "msg" => "Produto encontrado com sucesso",
-                "data" => $data
-            ]);
+            return json_encode($data);
         } catch (PDOException $e) {
             http_response_code(HttpEnum::SERVER_ERROR);
             return json_encode([
