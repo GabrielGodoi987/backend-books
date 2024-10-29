@@ -1,5 +1,4 @@
 <?php
-// página principal e padrão para o desenvolvimento do sistema
 namespace Backend\Products;
 
 require "../vendor/autoload.php";
@@ -7,8 +6,11 @@ require "../vendor/autoload.php";
 use Backend\Products\Controller\LogsController;
 use Backend\Products\Controller\ProductController;
 use Backend\Products\Controller\UserController;
+use Backend\Products\JWT\TokenManager;
+use Backend\Products\Middleware\TokenMiddleware;
 use Backend\Products\Routes\Router;
 use Backend\Products\Database\DatabaseConnection;
+use Exception;
 
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS, PUT, DELETE");
@@ -21,10 +23,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 header('Content-Type: application/json');
 $connection = new DatabaseConnection();
-
+$manager = new TokenManager();
+$middlewareToken = new TokenMiddleware();
 $products = new ProductController();
 $logs = new LogsController();
 $user = new UserController();
+
+$tokenManager = new TokenManager();
+
+// users Routes
+Router::post('/createuser', function() use($user){
+    $inputData = json_decode(file_get_contents("php://input"));
+    echo $user->createUser($inputData);
+});
+
+Router::post('/login', function () use ($user){
+    $inputData = json_decode(file_get_contents("php://input"));
+    echo $user->loginUser($inputData);
+});
+
+Router::post("/test", function() use($user, $tokenManager) {
+    $validate = $tokenManager->verifyToken();
+    try{
+        if ($validate) {
+            echo $validate;
+        }
+    }catch(Exception $e){
+        echo $e;
+    }
+});
+
+
 
 // products Routes
 Router::get('/product', function () use ($products) {
