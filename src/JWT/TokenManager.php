@@ -58,7 +58,7 @@ class TokenManager
         $authorization = $headers['Authorization'];
 
         if (!isset($authorization)) {
-            return "A requisição não foi autorizada.";
+            return false;
         }
 
         $jwt = explode(" ", $headers["Authorization"]);
