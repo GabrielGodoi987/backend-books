@@ -32,50 +32,55 @@ $user = new UserController();
 $tokenManager = new TokenManager();
 
 // users Routes
-Router::post('/createuser', function() use($user){
+Router::post('/createuser', function () use ($user) {
     $inputData = json_decode(file_get_contents("php://input"));
     echo $user->createUser($inputData);
 });
 
-Router::post('/login', function () use ($user){
+Router::post('/login', function () use ($user) {
     $inputData = json_decode(file_get_contents("php://input"));
     echo $user->loginUser($inputData);
 });
 
-Router::post("/test", function() use($user, $tokenManager) {
-    $validate = $tokenManager->verifyToken();
-    try{
-        if ($validate) {
-            echo $validate;
-        }
-    }catch(Exception $e){
-        echo $e;
-    }
-});
-
-
-
 // products Routes
-Router::get('/product', function () use ($products) {
-    echo $products->getAllProducts();
+Router::get('/product', function () use ($products, $tokenManager) {
+    $validate = $tokenManager->verifyToken();
+    if ($validate)
+        echo $products->getAllProducts();
+    else
+        echo json_encode(["msg" => "Usuário não autenticado"]);
 });
 
-Router::get('/product/find/{id}', function ($id) use ($products) {
-    echo $products->getProductById($id);
+Router::get('/product/find/{id}', function ($id) use ($products, $tokenManager) {
+    $validate = $tokenManager->verifyToken();
+    if ($validate)
+        echo $products->getProductById($id);
 });
 
-Router::delete("/product/delete/{id}", function ($id) use ($products) {
-    echo $products->deleteProduct($id);
+Router::delete("/product/delete/{id}", function ($id) use ($products, $tokenManager) {
+    $validate = $tokenManager->verifyToken();
+    if ($validate)
+        echo $products->deleteProduct($id);
+    else
+        echo json_encode(["msg" => "Usuário não autenticado"]);
 });
 
-Router::post("/product/create", function () use ($products) {
+Router::post("/product/create", function () use ($products, $tokenManager): void {
     $inputData = json_decode(file_get_contents("php://input"));
-    echo $products->createProduct($inputData);
+    $validate = $tokenManager->verifyToken();
+    if ($validate)
+        echo $products->createProduct($inputData);
+    else
+        echo json_encode(["msg" => "Usuário não autenticado"]);
 });
 
-Router::put("/product/update/{id}", function ($id) use ($products) {
+Router::put("/product/update/{id}", function ($id) use ($products, $tokenManager) {
     $inputData = json_decode(file_get_contents("php://input"));
-    echo $products->updateProduct($inputData, $id);
+    $validate = $tokenManager->verifyToken();
+    if ($validate)
+        echo $products->updateProduct($inputData, $id);
+    else
+        echo json_encode(["msg" => "Usuário não autenticado"]);
 });
 
 //logs Routes
@@ -83,8 +88,12 @@ Router::get('/logs', function () use ($logs) {
     echo $logs->getAllLogs();
 });
 
-Router::get("/logproduct/{id}", function ($id) use ($logs) {
-    echo $logs->getLogById($id);
+Router::get("/logproduct/{id}", function ($id) use ($logs, $tokenManager) {
+    $validate = $tokenManager->verifyToken();
+    if ($validate)
+        echo $logs->getLogById($id);
+    else
+        echo json_encode(["msg" => "Usuário não autenticado"]);
 });
 
 Router::resolve();

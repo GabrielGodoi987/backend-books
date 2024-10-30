@@ -72,9 +72,7 @@ class TokenManager
 
         try {
             $decoded = JWT::decode($jwt[1], new Key($this->key, $this->algorithm));
-            return json_encode( [
-                "data" => $decoded
-            ]);
+            return json_encode($decoded);
         } catch (Exception $e) {
             http_response_code(401);
             return json_encode([
