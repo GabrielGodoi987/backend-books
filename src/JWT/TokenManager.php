@@ -72,7 +72,6 @@ class TokenManager
 
         try {
             $decoded = JWT::decode($jwt[1], new Key($this->key, $this->algorithm));
-
             return json_encode( [
                 "data" => $decoded
             ]);
